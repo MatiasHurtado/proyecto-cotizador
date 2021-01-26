@@ -1,6 +1,7 @@
 import React,{useState} from 'react';
 import styled from '@emotion/styled';
-import {obtenerDiferenciaYear,calcularMarca} from '../helper'
+import PropType from 'prop-types';
+import {obtenerDiferenciaYear,calcularMarca,obtenerPlan} from '../helper'
 
 const Campo = styled.div `
     display:flex;
@@ -57,7 +58,7 @@ const Error = styled.div`
 
 
 
-const Formulario = () => {
+const Formulario = ({guardarResumen,guardarCargando}) => {
     
     const [datos,guardarDatos] = useState({
         marca:'',
@@ -100,10 +101,27 @@ const Formulario = () => {
         //asiatico 5
         //europeo 30
         resultado = calcularMarca(marca) * resultado;
-        console.log(resultado);
+    
+        
+
 
         //Basico aumenta 20%
         //Completo 50%
+        const incrementoPlan = obtenerPlan(plan)
+        resultado =  parseFloat(incrementoPlan * resultado).toFixed(2);
+
+        guardarCargando(true);
+        setTimeout(() =>{
+            //Elimina el spinner
+            guardarCargando(false);
+            //Pasa la informacion al componente principal
+            guardarResumen({
+                cotizacion:Number(resultado),
+                datos
+            })
+        },3000)
+      
+      
     }
     return ( 
         <form
@@ -165,6 +183,11 @@ const Formulario = () => {
             >Cotizar</Boton>
         </form>
      );
+}
+
+Formulario.prototype ={
+    guardarResumen:PropType.func.isRequired,
+    guardarCargando:PropType.func.isRequired
 }
  
 export default Formulario;
